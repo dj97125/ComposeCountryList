@@ -1,4 +1,4 @@
-package com.danielcaballero.mynewcompose.ui.theme
+package com.example.composecountrylist.ui.theme
 
 data class CheckInfo(
     val title: String,
