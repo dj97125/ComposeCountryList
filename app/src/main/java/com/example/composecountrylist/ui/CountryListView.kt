@@ -1,65 +1,210 @@
 package com.example.composecountrylist.ui
 
+import android.app.AlertDialog
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleOwner
 import com.example.composecountrylist.common.StateAction
+import com.example.composecountrylist.common.toast
+import com.example.composecountrylist.domain.Country
+import com.example.composecountrylist.ui.util.ShimmerListItem
 import com.example.composecountrylist.view_model.NetworkViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 
 @Composable
-fun CountryListView(viewModel: NetworkViewModel) {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .padding(8.dp)) {
+fun CountryListView(
+    viewModel: NetworkViewModel,
+    context: Context,
+    lifecycle: LifecycleOwner = LocalLifecycleOwner.current
+) {
 
-        val state by viewModel.countryResponse.collectAsState()
-        val composeState = viewModel.countryResponseeCompose
+    val state by viewModel.countryResponse.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-        when(state) {
-            is StateAction.ERROR -> TODO()
-            StateAction.LOADING -> TODO()
-            is StateAction.SUCCESS<*> -> TODO()
-            else -> {}
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = isRefreshing),
+        onRefresh = { viewModel.getCountryList(isRefreshing = true) },
+        indicator = { state, refreshTrigger ->
+            SwipeRefreshIndicator(
+                state = state,
+                refreshTriggerDistance = refreshTrigger,
+                scale = true,
+                contentColor = MaterialTheme.colors.primary,
+            )
         }
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
 
+            when (val currentState = state) {
+                is StateAction.ERROR -> {
+                    displayErrors(context) {
+                        viewModel.getCountryList()
+                    }
+                }
+
+                StateAction.LOADING -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(20) {
+                            ShimmerListItem(
+                                isLoading = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
+
+                }
+
+                is StateAction.SUCCESS<*> -> {
+                    val retrievedCountries = currentState.response as List<Country>
+                    RecyclerView(countriesForPopulate = retrievedCountries)
+                    if(!isRefreshing) context.toast("Success")
+                }
+
+                else -> {}
+            }
+
+        }
     }
 }
 
+fun displayErrors(
+    context: Context,
+    message: String = "A moment please! Working on the issues",
+    retry: () -> Unit
+) {
+    AlertDialog.Builder(context)
+        .setTitle("Error occurred")
+        .setPositiveButton("RETRY") { dialog, _ ->
+            dialog.dismiss()
+            retry()
+        }
+        .setNegativeButton("DISMISS") { dialog, _ ->
+            dialog.dismiss()
+        }
+        .setMessage(message)
+        .create()
+        .show()
+}
+
+
 @Composable
-fun RecyclerView() {
+fun RecyclerView(countriesForPopulate: List<Country>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-
-
+        countriesForPopulate.forEach { country ->
+            item {
+                ItemCountry(country = country)
+            }
+        }
     }
 }
 
 @Composable
-fun ItemCountry() {
+fun CustomText(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        softWrap = true,
+        fontSize = 15.sp,
+        modifier = modifier
+            .width(87.dp)
+            .padding(16.dp),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.h6
+    )
+}
+
+
+@Composable
+fun ItemCountry(
+    country: Country,
+//    onCountrySelected: (CountriesResponseItem) -> Unit
+) {
+
     Card(
-        border = BorderStroke(2.dp, Color.Red),
+        border = BorderStroke(2.dp, Color.LightGray),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 8.dp)
+            .wrapContentHeight()
+            .padding(vertical = 8.dp, horizontal = 8.dp),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        Column() {
-            
-        }
+        Column(modifier = Modifier.fillMaxWidth()) {
 
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                CustomText(
+                    text = "Country"
+                )
+                CustomText(
+                    text = country.name ?: "N/A"
+
+                )
+                CustomText(
+                    text = "Region"
+                )
+                CustomText(
+                    text = country.region ?: "N/A"
+
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                CustomText(
+                    text = "Capital"
+                )
+                CustomText(
+                    text = country.capital ?: "N/A"
+
+                )
+                CustomText(
+                    text = "Code"
+                )
+                CustomText(
+                    text = country.code ?: "N/A"
+                )
+            }
+        }
     }
-    
+
+
 }
