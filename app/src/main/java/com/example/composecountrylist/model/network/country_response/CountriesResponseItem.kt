@@ -1,31 +1,38 @@
 package com.example.composecountrylist.model.network.country_response
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class CountriesResponseItem(
+    @SerialName("capital")
     val capital: String?,
+    @SerialName("code")
     val code: String?,
+    @SerialName("name")
     val name: String?,
+    @SerialName("region")
     val region: String?
 )
 
+@Serializable
 data class Currency(
-    @SerializedName("code")
+    @SerialName("code")
     val code: String?,
-    @SerializedName("name")
+    @SerialName("name")
     val name: String?,
-    @SerializedName("symbol")
+    @SerialName("symbol")
     val symbol: String?
 )
-
+@Serializable
 data class Language(
-    @SerializedName("code")
+    @SerialName("code")
     val code: String?,
-    @SerializedName("iso639_2")
+    @SerialName("iso639_2")
     val iso6392: String?,
-    @SerializedName("name")
+    @SerialName("name")
     val name: String?,
-    @SerializedName("nativeName")
+    @SerialName("nativeName")
     val nativeName: String?
 )

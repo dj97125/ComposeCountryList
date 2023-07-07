@@ -3,7 +3,10 @@ plugins {
     id ("com.android.application")
     kotlin ("android")
     kotlin("kapt")
+    kotlin("plugin.serialization")
     id("dagger.hilt.android.plugin")
+//    id("org.jetbrains.kotlin.plugin.serialization")
+
 }
 
 android {
@@ -35,7 +38,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
 
     kotlinOptions {
@@ -55,6 +58,21 @@ dependencies {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
     }
+
+    implementation("io.ktor:ktor-client-core:1.6.3")
+    implementation("io.ktor:ktor-client-cio:1.6.3")
+    implementation("io.ktor:ktor-client-android:1.6.3")
+    implementation("io.ktor:ktor-client-serialization:1.6.3")
+    implementation("io.ktor:ktor-client-logging:1.6.3")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
+    implementation("io.ktor:ktor-client-serialization:1.6.4")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+
+
+
 
     implementation("androidx.core:core-ktx:1.8.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -100,11 +118,12 @@ dependencies {
 
 
 //Dagger Hilt
-    kapt("com.google.dagger:hilt-android-compiler:2.42")
+    kapt("com.google.dagger:hilt-android-compiler:2.46.1")
+    annotationProcessor("com.google.dagger:hilt-compiler:2.46.1")
     implementation("androidx.hilt:hilt-common:1.0.0")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("com.google.dagger:hilt-android:2.42")
-    kapt("com.google.dagger:hilt-compiler:2.42")
+    implementation("com.google.dagger:hilt-android:2.46.1")
+    kapt("com.google.dagger:hilt-compiler:2.46.1")
 
 // Material Design
     implementation("com.google.android.material:material:1.3.0-alpha02")

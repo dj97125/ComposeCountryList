@@ -69,22 +69,15 @@ fun CountryListView(
 
             when (val currentState = state) {
                 is StateAction.ERROR -> {
-                    displayErrors(context) {
+                    val isRetry = displayErrors(context) {
                         viewModel.getCountryList()
                     }
+
+                    if(isRetry) StartShimmer()
                 }
 
                 StateAction.LOADING -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(20) {
-                            ShimmerListItem(
-                                isLoading = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            )
-                        }
-                    }
+                    StartShimmer()
 
                 }
 
@@ -100,17 +93,33 @@ fun CountryListView(
         }
     }
 }
+@Composable
+fun StartShimmer(){
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(20) {
+            ShimmerListItem(
+                isLoading = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+        }
+    }
+
+}
 
 fun displayErrors(
     context: Context,
     message: String = "A moment please! Working on the issues",
     retry: () -> Unit
-) {
+): Boolean {
+    var isRetry = false
     AlertDialog.Builder(context)
         .setTitle("Error occurred")
         .setPositiveButton("RETRY") { dialog, _ ->
             dialog.dismiss()
             retry()
+            isRetry = true
         }
         .setNegativeButton("DISMISS") { dialog, _ ->
             dialog.dismiss()
@@ -118,6 +127,8 @@ fun displayErrors(
         .setMessage(message)
         .create()
         .show()
+
+    return isRetry
 }
 
 

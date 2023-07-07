@@ -1,12 +1,15 @@
 package com.example.composecountrylist.model.network
 
-import com.example.composecountrylist.common.FailedResponseException
-import com.example.composecountrylist.common.NullResponseException
+import com.example.composecountrylist.common.END_POINT_COUNTRIES_KTOR
 import com.example.composecountrylist.common.StateAction
 import com.example.composecountrylist.domain.Country
 import com.example.composecountrylist.model.network.country_response.CountriesResponseItem
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.decodeFromString
 import javax.inject.Inject
 
 interface RemoteDataSource {
@@ -14,18 +17,27 @@ interface RemoteDataSource {
 }
 
 class ServiceDataSource @Inject constructor(
-    private val service: NetworkAPI
+    private val service: HttpClient
 ) : RemoteDataSource {
 
     override fun countryCached(): Flow<StateAction> = flow {
-        val service = service.getCountriesList()
-        if (service.isSuccessful) {
-            service.body()?.let { result ->
-                emit(StateAction.SUCCESS(result.map { it.toDomainModel() },"Data From Network..."))
-            } ?: throw NullResponseException()
-        }else{
-            emit(StateAction.ERROR(FailedResponseException()))
+        try {
+            val response: List<CountriesResponseItem> = service.get {
+                url(END_POINT_COUNTRIES_KTOR)
+            }
+            emit(StateAction.SUCCESS(response.toDomainModel(), "Data From Network"))
+        } catch (e:NoTransformationFoundException){
+            val responseString: String = service.get(END_POINT_COUNTRIES_KTOR)
+
+            val json = kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+            }
+            val response = json.decodeFromString<List<CountriesResponseItem>>(responseString)
+            emit(StateAction.SUCCESS(response.toDomainModel(), "Data From Network"))
         }
+
+
+
     }
 }
 
