@@ -1,13 +1,13 @@
-
 plugins {
-    id ("com.android.application")
-    kotlin ("android")
+    id("com.android.application")
+    kotlin("android")
     kotlin("kapt")
     kotlin("plugin.serialization")
     id("dagger.hilt.android.plugin")
 //    id("org.jetbrains.kotlin.plugin.serialization")
 
 }
+
 
 android {
     namespace = "com.example.composecountrylist"
@@ -25,11 +25,15 @@ android {
     }
 
     buildTypes {
-        getByName("release")  {
+        getByName("release") {
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -85,9 +89,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
 
-
     ////Compose
     implementation("androidx.activity:activity-compose:1.3.1")
+    implementation("androidx.compose.material3:material3:1.1.1")
     implementation("androidx.compose.ui:ui:1.4.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")
     implementation("androidx.compose.material:material:1.4.3")
@@ -96,6 +100,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.4.3")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.3")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
 
 
     implementation("androidx.test:core:1.4.0")
@@ -103,7 +108,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.4.2")
     implementation("com.google.android.material:material:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation ("org.mockito:mockito-inline:4.4.0")
+    implementation("org.mockito:mockito-inline:4.4.0")
 
     //FlowCollector
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.0")
@@ -115,6 +120,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
 
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
+
+
 
 
 //Dagger Hilt
@@ -156,7 +163,6 @@ dependencies {
 
 //Swipe refresh
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
 
 
 }

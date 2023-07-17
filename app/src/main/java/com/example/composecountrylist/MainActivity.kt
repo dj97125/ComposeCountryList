@@ -5,12 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.ui.Modifier
-import com.example.composecountrylist.ui.CountryListView
-import com.example.composecountrylist.ui.theme.MyNewComposeTheme
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.example.composecountrylist.ui.CountryComposeApp
 import com.example.composecountrylist.view_model.NetworkViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,15 +18,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MyNewComposeTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    CountryListView(viewModel = viewModel, context = this)
-                }
-
-            }
+            CountryComposeApp(
+                darkTheme = isSystemInDarkTheme(),
+                viewModel = viewModel,
+                context = this
+            )
         }
 
     }

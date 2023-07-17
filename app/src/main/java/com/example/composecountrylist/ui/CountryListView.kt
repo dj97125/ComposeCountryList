@@ -3,6 +3,7 @@ package com.example.composecountrylist.ui
 import android.app.AlertDialog
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,8 @@ import androidx.lifecycle.LifecycleOwner
 import com.example.composecountrylist.common.StateAction
 import com.example.composecountrylist.common.toast
 import com.example.composecountrylist.domain.Country
+import com.example.composecountrylist.ui.theme.DarkColorPalette
+import com.example.composecountrylist.ui.theme.LightColorPalette
 import com.example.composecountrylist.ui.util.ShimmerListItem
 import com.example.composecountrylist.view_model.NetworkViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -40,6 +43,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun CountryListView(
+    darkTheme: Boolean,
     viewModel: NetworkViewModel,
     context: Context,
     lifecycle: LifecycleOwner = LocalLifecycleOwner.current
@@ -57,7 +61,7 @@ fun CountryListView(
                 state = state,
                 refreshTriggerDistance = refreshTrigger,
                 scale = true,
-                contentColor = MaterialTheme.colors.primary,
+                contentColor = if (darkTheme) DarkColorPalette.primary else LightColorPalette.primary,
             )
         }
     ) {
@@ -73,7 +77,7 @@ fun CountryListView(
                         viewModel.getCountryList()
                     }
 
-                    if(isRetry) StartShimmer()
+                    if (isRetry) StartShimmer()
                 }
 
                 StateAction.LOADING -> {
@@ -83,8 +87,8 @@ fun CountryListView(
 
                 is StateAction.SUCCESS<*> -> {
                     val retrievedCountries = currentState.response as List<Country>
-                    RecyclerView(countriesForPopulate = retrievedCountries)
-                    if(!isRefreshing) context.toast("Success")
+                    RecyclerView(countriesForPopulate = retrievedCountries, darkTheme = darkTheme)
+                    if (!isRefreshing) context.toast("Success")
                 }
 
                 else -> {}
@@ -93,8 +97,9 @@ fun CountryListView(
         }
     }
 }
+
 @Composable
-fun StartShimmer(){
+fun StartShimmer() {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(20) {
             ShimmerListItem(
@@ -133,22 +138,23 @@ fun displayErrors(
 
 
 @Composable
-fun RecyclerView(countriesForPopulate: List<Country>) {
+fun RecyclerView(countriesForPopulate: List<Country>, darkTheme: Boolean) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         countriesForPopulate.forEach { country ->
             item {
-                ItemCountry(country = country)
+                ItemCountry(country = country, darkTheme = darkTheme)
             }
         }
     }
 }
 
 @Composable
-fun CustomText(text: String, modifier: Modifier = Modifier) {
+fun CustomText(text: String, modifier: Modifier = Modifier, darkTheme: Boolean) {
     Text(
         text = text,
+        color = if (darkTheme) DarkColorPalette.primary else LightColorPalette.primary,
         softWrap = true,
         fontSize = 15.sp,
         modifier = modifier
@@ -163,6 +169,7 @@ fun CustomText(text: String, modifier: Modifier = Modifier) {
 @Composable
 fun ItemCountry(
     country: Country,
+    darkTheme: Boolean
 //    onCountrySelected: (CountriesResponseItem) -> Unit
 ) {
 
@@ -181,17 +188,21 @@ fun ItemCountry(
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 CustomText(
-                    text = "Country"
+                    text = "Country",
+                    darkTheme = darkTheme
                 )
                 CustomText(
-                    text = country.name ?: "N/A"
+                    text = country.name ?: "N/A",
+                    darkTheme = darkTheme
 
                 )
                 CustomText(
-                    text = "Region"
+                    text = "Region",
+                    darkTheme = darkTheme
                 )
                 CustomText(
-                    text = country.region ?: "N/A"
+                    text = country.region ?: "N/A",
+                    darkTheme = darkTheme
 
                 )
             }
@@ -201,17 +212,21 @@ fun ItemCountry(
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 CustomText(
-                    text = "Capital"
+                    text = "Capital",
+                    darkTheme = darkTheme
                 )
                 CustomText(
-                    text = country.capital ?: "N/A"
+                    text = country.capital ?: "N/A",
+                    darkTheme = darkTheme
 
                 )
                 CustomText(
-                    text = "Code"
+                    text = "Code",
+                    darkTheme = darkTheme
                 )
                 CustomText(
-                    text = country.code ?: "N/A"
+                    text = country.code ?: "N/A",
+                    darkTheme = darkTheme
                 )
             }
         }
