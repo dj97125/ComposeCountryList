@@ -11,8 +11,6 @@ interface CountryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLocalCountry(countryEntity: List<CountryEntity>)
 
-    @Query("DELETE FROM CountryEntity")
-    suspend fun deleteAllCountryLocalItem()
 
     @Query("SELECT * FROM CountryEntity order by id")
     suspend fun getAllCachedCountries(): List<CountryEntity>

@@ -2,10 +2,9 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    id("kotlin-parcelize")
     kotlin("plugin.serialization")
     id("dagger.hilt.android.plugin")
-//    id("org.jetbrains.kotlin.plugin.serialization")
-
 }
 
 
@@ -42,7 +41,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.8"
+        kotlinCompilerExtensionVersion = "1.4.1"
     }
 
     kotlinOptions {
@@ -73,7 +72,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
     implementation("io.ktor:ktor-client-serialization:1.6.4")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
 
 
@@ -95,12 +94,14 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.4.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")
     implementation("androidx.compose.material:material:1.4.3")
+    implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
     debugImplementation("androidx.compose.ui:ui-tooling:1.4.3")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.3")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
 
     implementation("androidx.test:core:1.4.0")
@@ -120,8 +121,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
 
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
-
-
 
 
 //Dagger Hilt
@@ -147,9 +146,14 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
 
 //Room
-    implementation("androidx.room:room-ktx:2.4.2")
-    implementation("androidx.room:room-runtime:2.5.1")
-    kapt("androidx.room:room-compiler:2.5.1")
+    val room_version = "2.5.2"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+
+    kapt("androidx.room:room-compiler:$room_version")
+
+    implementation("androidx.room:room-ktx:$room_version")
 //ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")

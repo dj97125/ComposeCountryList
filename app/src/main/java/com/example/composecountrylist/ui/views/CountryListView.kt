@@ -1,9 +1,9 @@
-package com.example.composecountrylist.ui
+package com.example.composecountrylist.ui.views
 
 import android.app.AlertDialog
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,11 +46,13 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 fun CountryListView(
     darkTheme: Boolean,
     viewModel: NetworkViewModel,
-    context: Context,
+    context: Context = LocalContext.current,
+//    onNavigate: (Country) -> Unit,
+    onNavigate: () -> Unit,
     lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 ) {
 
-    val state by viewModel.countryResponse.collectAsState()
+    val uiState by viewModel.countryResponse.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
 
@@ -71,7 +74,7 @@ fun CountryListView(
                 .padding(8.dp)
         ) {
 
-            when (val currentState = state) {
+            when (val currentState = uiState) {
                 is StateAction.ERROR -> {
                     val isRetry = displayErrors(context) {
                         viewModel.getCountryList()
@@ -87,7 +90,14 @@ fun CountryListView(
 
                 is StateAction.SUCCESS<*> -> {
                     val retrievedCountries = currentState.response as List<Country>
-                    RecyclerView(countriesForPopulate = retrievedCountries, darkTheme = darkTheme)
+                    RecyclerView(
+                        countriesForPopulate = retrievedCountries,
+                        darkTheme = darkTheme,
+                        onNavigate = {
+                            viewModel.addCountryDetails(it)
+                        },
+                        onNextScreen = { onNavigate() }
+                    )
                     if (!isRefreshing) context.toast("Success")
                 }
 
@@ -138,13 +148,25 @@ fun displayErrors(
 
 
 @Composable
-fun RecyclerView(countriesForPopulate: List<Country>, darkTheme: Boolean) {
+fun RecyclerView(
+    countriesForPopulate: List<Country>,
+    darkTheme: Boolean,
+    onNavigate: (Country) -> Unit,
+    onNextScreen: () -> Unit,
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         countriesForPopulate.forEach { country ->
             item {
-                ItemCountry(country = country, darkTheme = darkTheme)
+                ItemCountry(
+                    country = country,
+                    darkTheme = darkTheme,
+                    onNavigate = {
+                        onNavigate(it)
+                    },
+                    onNextScreen = { onNextScreen() }
+                )
             }
         }
     }
@@ -169,8 +191,9 @@ fun CustomText(text: String, modifier: Modifier = Modifier, darkTheme: Boolean) 
 @Composable
 fun ItemCountry(
     country: Country,
-    darkTheme: Boolean
-//    onCountrySelected: (CountriesResponseItem) -> Unit
+    darkTheme: Boolean,
+    onNavigate: (Country) -> Unit,
+    onNextScreen: () -> Unit,
 ) {
 
     Card(
@@ -178,7 +201,11 @@ fun ItemCountry(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(vertical = 8.dp, horizontal = 8.dp),
+            .padding(vertical = 8.dp, horizontal = 8.dp)
+            .clickable {
+                onNavigate(country)
+                onNextScreen()
+            },
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {

@@ -9,7 +9,6 @@ import javax.inject.Inject
 interface LocalDataSource {
     fun getAllCachedCountries(): Flow<StateAction>
     suspend fun insertLocalCountry(country: List<Country>): Flow<StateAction>
-    suspend fun deleteAllCountryLocalItem()
 }
 
 class RoomDataSource @Inject constructor(
@@ -28,10 +27,7 @@ class RoomDataSource @Inject constructor(
         countryDao.insertLocalCountry(country.fromDomainModel())
     }
 
-    override suspend fun deleteAllCountryLocalItem() {
 
-        return countryDao.deleteAllCountryLocalItem()
-    }
 
 
 }

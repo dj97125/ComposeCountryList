@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.composecountrylist.common.StateAction
+import com.example.composecountrylist.domain.Country
 import com.example.composecountrylist.domain.UseCase
+import com.example.composecountrylist.ui.util.NavArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NetworkViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val useCase: UseCase,
     private val coroutineScope: CoroutineScope,
     private val handler: CoroutineExceptionHandler
@@ -29,6 +33,7 @@ class NetworkViewModel @Inject constructor(
 
     private val _countryResponse: MutableStateFlow<StateAction> =
         MutableStateFlow(StateAction.LOADING)
+
     val countryResponse: StateFlow<StateAction>
         get() = _countryResponse.asStateFlow()
 
@@ -37,9 +42,18 @@ class NetworkViewModel @Inject constructor(
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
+//    private val details: Country = savedStateHandle[NavArgs.Item.key] ?: Country("", "", "", "")
+    var countryDetails by mutableStateOf<Country?>(null)
+        private set
+
 
     init {
         getCountryList()
+
+    }
+
+    fun addCountryDetails(details: Country) {
+        countryDetails = details
     }
 
 

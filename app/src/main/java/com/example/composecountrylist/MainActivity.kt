@@ -20,8 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CountryComposeApp(
                 darkTheme = isSystemInDarkTheme(),
-                viewModel = viewModel,
-                context = this
+                viewModel = viewModel
             )
         }
 
